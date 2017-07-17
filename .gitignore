@@ -1,0 +1,7 @@
+/vendor
+/node_modules
+/public/assets
+/public/invoices
+.env
+.idea
+*.iml

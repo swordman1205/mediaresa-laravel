@@ -1,0 +1,57 @@
+image: dsferruzza/php-node-build
+
+variables:
+  DEBIAN_FRONTEND: noninteractive
+  COMPOSER_NO_INTERACTION: "1"
+
+before_script:
+  - php -v
+  - node -v
+  - npm -v
+  - grunt --version
+  - bower --allow-root --version
+  - apt-get update && apt-get install -y php5-mcrypt libxrender1 libxext6 php5-curl
+  - composer install --no-dev --no-progress
+  - npm install --quiet
+  - bower install --allow-root --quiet
+  - grunt prod
+
+deploy_preprod:
+  script:
+    - curl -O https://gitlab.escaledigitale.com/escale/deployer-recipes/raw/v1.1.7/deployer.phar
+    - curl -O https://gitlab.escaledigitale.com/escale/deployer-recipes/raw/v1.1.7/recipes.php
+    - php deployer.phar deploy_preprod preprod
+  tags:
+    - docker
+  only:
+    - triggers
+
+deploy_prepreprod:
+  script:
+    - curl -O https://gitlab.escaledigitale.com/escale/deployer-recipes/raw/v1.1.7/deployer.phar
+    - curl -O https://gitlab.escaledigitale.com/escale/deployer-recipes/raw/v1.1.7/recipes.php
+    - php deployer.phar deploy_preprod prepreprod
+  tags:
+    - docker
+  only:
+    - master
+
+deploy_prod:
+  script:
+    - curl -O https://gitlab.escaledigitale.com/escale/deployer-recipes/raw/v1.1.7/deployer.phar
+    - curl -O https://gitlab.escaledigitale.com/escale/deployer-recipes/raw/v1.1.7/recipes.php
+    - php deployer.phar deploy_prod prod
+  tags:
+    - docker
+  only:
+    - tags
+
+build:
+  script:
+    - ls -lha
+  tags:
+    - docker
+  except:
+    - master
+    - tags
+    - triggers
